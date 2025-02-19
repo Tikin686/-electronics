@@ -1,14 +1,19 @@
 import os
+from datetime import timedelta
 from pathlib import Path
+
+from dotenv import load_dotenv
+
+load_dotenv()  # Загрузка переменных среды из файла .env.
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-DEBUG = True
+DEBUG = os.getenv("DEBUG", False) == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 INSTALLED_APPS = [
@@ -56,11 +61,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.getenv("POSTGRES_DB"),
-        'USER': os.getenv("POSTGRES_USER"),
-        'PASSWORD': os.getenv("POSTGRES_PASSWORD"),
-        'HOST': os.getenv("POSTGRES_HOST"),
-        'PORT': os.getenv("POSTGRES_PORT "),
+        'NAME': os.getenv('POSTGRES_DB'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': os.getenv('POSTGRES_HOST'),
+        'PORT': os.getenv('POSTGRES_PORT'),
     }
 }
 
@@ -90,7 +95,25 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
-
 STATICFILES_DIRS = (BASE_DIR / "static",)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR.joinpath("media")
+
+AUTH_USER_MODEL = "users.User"
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=10),
+}
